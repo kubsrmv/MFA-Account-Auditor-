@@ -4,11 +4,11 @@ from dateutil import parser
 from datetime import datetime, timezone
 import os
 
-# OpenAI import (safe if not installed)
+
 try:
     from openai import OpenAI
 except ImportError:
-    OpenAI = None  # we'll handle gracefully later
+    OpenAI = None  
 
 st.set_page_config(page_title="MFA & Account Hygiene Auditor", layout="wide")
 
@@ -37,7 +37,7 @@ def parse_ts(x):
     except Exception:
         return None
 
-# ---- safe secrets helper (env first, then st.secrets; never crash) ----
+
 def get_secret(name: str, default: str | None = None):
     v = os.getenv(name)
     if v:
@@ -62,7 +62,7 @@ if uploaded:
 
     now = datetime.now(timezone.utc)
 
-    # Normalize
+   
     df["_email"] = df[g("email")].astype(str).str.strip().str.lower()
     df["_dept"] = df[g("department")].astype(str).str.strip() if g("department") else "General"
     df["_role"] = df[g("role")].astype(str).str.strip() if g("role") else ""
@@ -73,15 +73,15 @@ if uploaded:
     df["_days_since_login"] = df["_last_login"].apply(lambda t: (now - t).days if t else None)
     df["_never_logged"] = df["_last_login"].isna()
 
-    # ---- Metrics (use ACTIVE users as the base) ----
+    
     total = len(df)
     active_mask = df["_status"].isin(["active", "enabled", ""])
     active = int(active_mask.sum())
 
-    # MFA coverage among active only
+    
     mfa_cov = 100.0 * (df.loc[active_mask, "_mfa"].sum() / max(1, active))
 
-    # Admins among active only (to match the w/o MFA count)
+    
     admins_active = int(df.loc[active_mask, "_admin"].sum())
     admins_wo_mfa = int((df["_admin"] & ~df["_mfa"] & active_mask).sum())
 
@@ -89,21 +89,21 @@ if uploaded:
     never_recent = int((active_mask & df["_never_logged"]).sum())
     disabled_recent_login = int((~active_mask & (df["_days_since_login"].fillna(10**6) <= RECENT_DAYS)).sum())
 
-    # Simple risk score (demo)
+    
     risk = 100
     risk -= int(mfa_cov * 0.4)             # MFA coverage helps
     risk -= min(30, admins_wo_mfa * 5)     # punish admin w/o MFA
     risk -= min(20, stale * 1)             # stale accounts add risk
     risk = max(0, min(100, risk))
 
-    # KPI tiles
+    
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Users (active)", f"{active}/{total}")
     m2.metric("MFA coverage", f"{mfa_cov:.1f}%")
     m3.metric("Admins (active) w/o MFA", str(admins_wo_mfa))
     m4.metric("Risk score (lower is better)", str(risk))
 
-    # Findings
+    
     st.subheader("Findings (prioritized)")
     f_admin_nomfa = df[(df["_admin"]) & (~df["_mfa"]) & active_mask]
     f_stale = df[active_mask & (df["_days_since_login"].fillna(10**6) > STALENESS_DAYS)]
@@ -149,9 +149,9 @@ if uploaded:
     )
     st.bar_chart(dept)
 
-    # ----------------------------
-    # 🧠 Chat assistant (gpt-5 → gpt-4o fallback), secrets safe
-    # ----------------------------
+    
+    
+    
     OPENAI_API_KEY = get_secret("OPENAI_API_KEY")
     PRIMARY_MODEL = (get_secret("OPENAI_MODEL") or "gpt-5").strip()
     FALLBACK_MODEL = "gpt-4o"
@@ -254,7 +254,7 @@ if uploaded:
     st.download_button("Download Markdown report", report_md, file_name="mfa_account_hygiene_report.md")
 
 else:
-    # Minimal sidebar even without data
+    
     with st.sidebar:
         st.header("🧠 Security Assistant")
         st.info("Upload a CSV to enable the assistant and KPIs.")

@@ -1,19 +1,25 @@
-# 🎈 Blank app template
+# MFA & Account Hygiene Auditor
 
-A simple Streamlit app template for you to modify!
+A lightweight **Streamlit** app for businesses to spot identity risks from a simple **users CSV**. It computes KPIs, flags risky accounts, and includes a built-in **AI assistant** that summarizes findings and suggests remediations.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+> Live demo (update after deploy): https://mfa-accounthygieneauditor.streamlit.app/
 
-### How to run it on your own machine
+---
 
-1. Install the requirements
+## What it shows
+- **MFA coverage** (overall and by department)
+- **Admins without MFA** (highest priority)
+- **Stale active accounts** (> `STALENESS_DAYS`, default 90)
+- **Active accounts that never logged in**
+- **Disabled users with recent logins** (≤ `RECENT_DAYS`, default 14)
+- **Risk score (0–100)** for a quick posture read
+- **Downloadable Markdown report**
+- **🧠 Sidebar chat assistant** (uses OpenAI) to explain findings / draft exec summaries
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+---
 
-2. Run the app
+## Quick start (local)
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+1) **Install**
+```bash
+pip install -r requirements.txt

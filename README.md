@@ -2,7 +2,7 @@
 
 A lightweight **Streamlit** app for businesses to spot identity risks from a simple **users CSV**. It computes KPIs, flags risky accounts, and includes a built-in **AI assistant** that summarizes findings and suggests remediations.
 
-https://mfa-accounthygieneauditor.streamlit.app/
+[https://mfa-accounthygieneauditor.streamlit.app/](https://mfa-auditor.streamlit.app/)
 
 ---
 
